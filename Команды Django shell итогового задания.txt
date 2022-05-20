@@ -1,0 +1,114 @@
+Что вы должны сделать в консоли Django?
+
+Подготовка (выполняется уже в Django Shell):
+from newspaper.models import *
+
+1 Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+	Ответ: 	u1 = User.objects.create_user(username='Robert')
+		u2 = User.objects.create_user(username='Ioanna')
+
+2 Создать два объекта модели Author, связанные с пользователями.
+	Ответ:	Author.objects.create(authorUser=u1)
+		Author.objects.create(authorUser=u2)
+
+3 Добавить 4 категории в модель Category.
+	Ответ:	Category.objects.create(name = 'Aducation')
+		Category.objects.create(name = 'Humor')
+		Category.objects.create(name = 'Politics')
+		Category.objects.create(name = 'urbanism')
+		
+
+4 Добавить 2 статьи и 1 новость.
+	Ответ:	создаём переменную author = Author.objects.get(id=1)
+
+		И для автора с id=1 сoздаём посты:
+
+		Post.objects.create(author=author, categoryType = 'AR',title='fiersttitle', text='fierstbigtext')
+		Post.objects.create(author=author, categoryType = 'AR',title='secondtitle', text='secondbigtext')
+		Post.objects.create(author=author, categoryType = 'NW',title='thirdtitle', text='thirdbigtext')
+		
+		создаём переменную author2 = Author.objects.get(id=2)
+
+		И для автора с id=1 сjздаём пост:
+		
+		Post.objects.create(author=author2, categoryType = 'AR',title='thirdtitle', text='thirdbigtext')
+
+
+
+5 Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+	Ответ:	Post.objects.get(id=1).postCategory.add(Category.objects.get(id=1))
+		Post.objects.get(id=1).postCategory.add(Category.objects.get(id=2))
+		Post.objects.get(id=2).postCategory.add(Category.objects.get(id=2))
+		Post.objects.get(id=3).postCategory.add(Category.objects.get(id=4))
+		Post.objects.get(id=4).postCategory.add(Category.objects.get(id=3))
+		
+
+6 Создать как минимум 4 комментария к разным объектам модели Post 
+(в каждом объекте должен быть как минимум один комментарий).
+	Ответ:	Comment.objects.create(commentPost=Post.objects.get(id=1),commentUser=Author.objects.get(id=1).authorUser, text='anycomment1')
+		Comment.objects.create(commentPost=Post.objects.get(id=1),commentUser=Author.objects.get(id=2).authorUser, text='anycomment12')
+		Comment.objects.create(commentPost=Post.objects.get(id=2),commentUser=Author.objects.get(id=1).authorUser, text='anycomment2')
+		Comment.objects.create(commentPost=Post.objects.get(id=3),commentUser=Author.objects.get(id=2).authorUser, text='anycomment3')
+		Comment.objects.create(commentPost=Post.objects.get(id=4),commentUser=Author.objects.get(id=2).authorUser, text='anycomment4')
+
+7 Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+Обновить рейтинги пользователей.
+	Ответ:	Post.objects.get(id=1).dislike()
+		Post.objects.get(id=2).like()
+		Post.objects.get(id=3).dislike()
+		Post.objects.get(id=4).like()	
+
+		Comment.objects.get(id=1).like()
+		Comment.objects.get(id=2).like()
+		Comment.objects.get(id=3).dislike()
+		Comment.objects.get(id=4).dislike()
+
+8 Обновить рейтинги пользователей.
+	Ответ:	Author.objects.get(id=1).update_rating()
+		Author.objects.get(id=2).update_rating()
+
+9 Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+	Ответ: сначала сортируем -  a=Author.objects.order_by('-authorUserRating')[:1]
+		>>> <QuerySet [<Author: Author object (2)>]>
+
+		Author.objects.get(id=2).authorUserRating
+		Author.objects.get(id=2).authorUser.username
+
+
+10 Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на 
+лайках/дислайках к этой статье.
+	Ответ: сначала сортируем p=Post.objects.order_by('-rating')[:1]
+	>>> <QuerySet [<Post: Post object (2)>]>
+		
+		Post.objects.get(id=2).dateCreation
+		Post.objects.get(id=2).author.authorUser.username
+		Post.objects.get(id=2).rating
+		Post.objects.get(id=2).title
+		Post.objects.get(id=2).prewiew()
+
+	
+11 Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+	Ответ: 	a=Post.objects.get(id=2)
+		c=Comment.objects.filter(commentPost=a)
+
+	Комментарий к этой статье только 1 есть:
+			>>> c
+			<QuerySet [<Comment: Comment object (3)>]>
+	Выводим дату:	
+		Comment.objects.get(id=3).dateCreation
+
+	Выводим пользователя, автора коммента:	
+		Comment.objects.get(id=3).commentUser.username
+
+	Выводим рейтинг коммента:
+		Comment.objects.get(id=3).rating
+
+	Выводим текст коммента:
+		Comment.objects.get(id=3).text
+ 
+
+		
+
+
+
+
